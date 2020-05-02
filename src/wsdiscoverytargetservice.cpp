@@ -20,8 +20,11 @@ class WSDiscoveryTargetServiceData : public QSharedData
 {
   public:
     QString endpointReference;
+    bool typeListValid = false;
     QList<KDQName> typeList;
+    bool scopeListValid = false;
     QList<QUrl> scopeList;
+    bool xAddrListValid = false;
     QList<QUrl> xAddrList;
     QDateTime lastSeen;
 };
@@ -76,6 +79,11 @@ bool WSDiscoveryTargetService::isMatchingScope(const QUrl &matchingScope) const
     return false;
 }
 
+bool WSDiscoveryTargetService::isXAddrListValid() const 
+{
+    return d->xAddrListValid;
+}
+
 QList<QUrl> WSDiscoveryTargetService::xAddrList() const
 {
     return d->xAddrList;
@@ -83,7 +91,13 @@ QList<QUrl> WSDiscoveryTargetService::xAddrList() const
 
 void WSDiscoveryTargetService::setXAddrList(const QList<QUrl> &xAddrList)
 {
+    d->xAddrListValid = true;
     d->xAddrList = xAddrList;
+}
+
+bool WSDiscoveryTargetService::isScopeListValid() const 
+{
+    return d->scopeListValid;
 }
 
 QList<QUrl> WSDiscoveryTargetService::scopeList() const
@@ -93,7 +107,13 @@ QList<QUrl> WSDiscoveryTargetService::scopeList() const
 
 void WSDiscoveryTargetService::setScopeList(const QList<QUrl> &scopeList)
 {
+    d->scopeListValid = true;
     d->scopeList = scopeList;
+}
+
+bool WSDiscoveryTargetService::isTypeListValid() const 
+{
+    return d->typeListValid;
 }
 
 QList<KDQName> WSDiscoveryTargetService::typeList() const
@@ -103,6 +123,7 @@ QList<KDQName> WSDiscoveryTargetService::typeList() const
 
 void WSDiscoveryTargetService::setTypeList(const QList<KDQName> &typeList)
 {
+    d->typeListValid = true;
     d->typeList = typeList;
 }
 

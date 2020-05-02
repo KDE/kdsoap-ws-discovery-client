@@ -159,10 +159,13 @@ void testWSDiscoveryClient::testReceiveProbeMatch()
     const WSDiscoveryTargetService& probeMatchService = qvariant_cast<WSDiscoveryTargetService>(arguments.at(0));
 
     QCOMPARE(probeMatchService.endpointReference(), "Incomming_unique_reference");
+    QCOMPARE(probeMatchService.isScopeListValid(), true);
     QCOMPARE(probeMatchService.scopeList().size(), 1);
     QCOMPARE(probeMatchService.scopeList().at(0), QUrl(QStringLiteral("ldap:///ou=engineering,o=examplecom,c=us")));
+    QCOMPARE(probeMatchService.isTypeListValid(), true);
     QCOMPARE(probeMatchService.typeList().size(), 1);
     QCOMPARE(probeMatchService.typeList().at(0), KDQName(QStringLiteral("http://printer.example.org/2003/imaging"), QStringLiteral("PrintBasic")));
+    QCOMPARE(probeMatchService.isXAddrListValid(), true);
     QCOMPARE(probeMatchService.xAddrList().size(), 1);
     QCOMPARE(probeMatchService.xAddrList().at(0), QUrl(QStringLiteral("http://prn-example/PRN42/b42-1668-a")));
     QVERIFY(probeMatchService.lastSeen().msecsTo(QDateTime::currentDateTime()) < 500);
@@ -222,10 +225,13 @@ void testWSDiscoveryClient::testReceiveResolveMatch()
     const WSDiscoveryTargetService& probeMatchService = qvariant_cast<WSDiscoveryTargetService>(arguments.at(0));
 
     QCOMPARE(probeMatchService.endpointReference(), "Incomming_resolve_reference");
+    QCOMPARE(probeMatchService.isScopeListValid(), true);
     QCOMPARE(probeMatchService.scopeList().size(), 1);
     QCOMPARE(probeMatchService.scopeList().at(0), QUrl(QStringLiteral("ldap:///ou=floor1,ou=b42,ou=anytown,o=examplecom,c=us")));
+    QCOMPARE(probeMatchService.isTypeListValid(), true);
     QCOMPARE(probeMatchService.typeList().size(), 1);
     QCOMPARE(probeMatchService.typeList().at(0), KDQName(QStringLiteral("http://printer.example.org/2003/imaging"), QStringLiteral("PrintAdvanced")));
+    QCOMPARE(probeMatchService.isXAddrListValid(), true);
     QCOMPARE(probeMatchService.xAddrList().size(), 1);
     QCOMPARE(probeMatchService.xAddrList().at(0), QUrl(QStringLiteral("http://printer.local:8080")));
     QVERIFY(probeMatchService.lastSeen().msecsTo(QDateTime::currentDateTime()) < 500);

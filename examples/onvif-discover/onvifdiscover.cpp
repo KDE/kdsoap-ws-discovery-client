@@ -51,16 +51,28 @@ void OnvifDiscover::matchReceived(const QSharedPointer<WSDiscoveryTargetService>
 {
     qDebug() << "ProbeMatch received:";
     qDebug() << "  Endpoint reference:" << matchedService->endpointReference();
-    const auto& typeList = matchedService->typeList();
-    for(const auto& type : typeList) {
-        qDebug() << "  Type:"  << type.localName() << "in namespace" << type.nameSpace();
+    if (matchedService->isTypeListValid()) {
+        const auto& typeList = matchedService->typeList();
+        for(const auto& type : typeList) {
+            qDebug() << "  Type:"  << type.localName() << "in namespace" << type.nameSpace();
+        }
+    } else {
+        qDebug() << "  Type list is omitted";
     }
-    const auto& scopeList = matchedService->scopeList();
-    for(const auto& scope : scopeList) {
-        qDebug() << "  Scope:"  << scope.toString();
+    if (matchedService->isScopeListValid()) {
+        const auto& scopeList = matchedService->scopeList();
+        for(const auto& scope : scopeList) {
+            qDebug() << "  Scope:"  << scope.toString();
+        }
+    } else {
+        qDebug() << "  Scope list is omitted";
     }
-    const auto& xAddrList = matchedService->xAddrList();
-    for(const auto& xAddr : xAddrList) {
-        qDebug() << "  XAddr:" << xAddr.toString();
+    if (matchedService->isXAddrListValid()) {
+        const auto& xAddrList = matchedService->xAddrList();
+        for(const auto& xAddr : xAddrList) {
+            qDebug() << "  XAddr:" << xAddr.toString();
+        }
+    } else {
+        qDebug() << "  XAddr list is omitted";
     }
 }

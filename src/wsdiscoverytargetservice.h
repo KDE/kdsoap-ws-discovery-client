@@ -34,12 +34,19 @@ public:
 
     void setEndpointReference(const QString &endpointReference);
     QString endpointReference() const;
+    
+    bool isTypeListValid() const;
     QList<KDQName> typeList() const;
     void setTypeList(const QList<KDQName> &typeList);
+    
+    bool isScopeListValid() const;
     QList<QUrl> scopeList() const;
     void setScopeList(const QList<QUrl> &scopeList);
+    
+    bool isXAddrListValid() const;
     QList<QUrl> xAddrList() const;
     void setXAddrList(const QList<QUrl> &xAddrList);
+    
     QDateTime lastSeen() const;
     void setLastSeen(const QDateTime &lastSeen);
     void updateLastSeen();

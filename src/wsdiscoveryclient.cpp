@@ -137,8 +137,14 @@ void WSDiscoveryClient::receivedMessage(const KDSoapMessage &replyMessage, const
         auto resolveMatch = resolveMatches.resolveMatch();
         const QString& endpointReference = resolveMatch.endpointReference().address();
         auto service = WSDiscoveryTargetService(endpointReference);
-        service.setTypeList(resolveMatch.types().entries());
-        service.setScopeList(QUrl::fromStringList(resolveMatch.scopes().value().entries()));
+        if (resolveMatch.hasValueForTypes()) {
+            service.setTypeList(resolveMatch.types().entries());
+        }
+        if (resolveMatch.hasValueForScopes()) {
+            service.setScopeList(QUrl::fromStringList(resolveMatch.scopes().value().entries()));
+        } else {
+            service.setScopeList(QList<QUrl>() << QUrl("http://schemas.xmlsoap.org/ws/2005/04/discovery/adhoc"));
+        }
         service.setXAddrList(QUrl::fromStringList(resolveMatch.xAddrs().entries()));
         service.updateLastSeen();
         emit resolveMatchReceived(service);
@@ -150,9 +156,15 @@ void WSDiscoveryClient::receivedMessage(const KDSoapMessage &replyMessage, const
         for(const WSDiscovery200504::TNS__ProbeMatchType& probeMatch : probeMatchList) {
             const QString& endpointReference = probeMatch.endpointReference().address();
             auto service = WSDiscoveryTargetService(endpointReference);
-            service.setTypeList(probeMatch.types().entries());
-            service.setScopeList(QUrl::fromStringList(probeMatch.scopes().value().entries()));
-            service.setXAddrList(QUrl::fromStringList(probeMatch.xAddrs().entries()));
+            if (probeMatch.hasValueForTypes()) {
+                service.setTypeList(probeMatch.types().entries());
+            }
+            if (probeMatch.hasValueForScopes()) {
+                service.setScopeList(QUrl::fromStringList(probeMatch.scopes().value().entries()));
+            }
+            if (probeMatch.hasValueForXAddrs()) {
+                service.setXAddrList(QUrl::fromStringList(probeMatch.xAddrs().entries()));
+            }
             service.updateLastSeen();
             emit probeMatchReceived(service);
         }
