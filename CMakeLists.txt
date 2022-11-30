@@ -32,10 +32,16 @@ include(KDECMakeSettings)
 include(GenerateExportHeader)
 
 set(REQUIRED_QT_VERSION 5.9.0)
-find_package(Qt5 ${REQUIRED_QT_VERSION} REQUIRED NO_MODULE COMPONENTS Core Network Xml)
+find_package(Qt${QT_MAJOR_VERSION} ${REQUIRED_QT_VERSION} REQUIRED NO_MODULE COMPONENTS Core Network Xml)
 
-find_package(KDSoap 1.9.0 REQUIRED)
-set_package_properties(KDSoap PROPERTIES
+if (QT_MAJOR_VERSION STREQUAL "6")
+    set(KDSOAP_POSTFIX "-qt6")
+else()
+    set(KDSOAP_POSTFIX "")
+endif()
+
+find_package(KDSoap${KDSOAP_POSTFIX} 1.9.0 REQUIRED)
+set_package_properties(KDSoap${KDSOAP_POSTFIX} PROPERTIES
     DESCRIPTION "A Qt-based client-side and server-side SOAP component"
     URL "http://www.kdab.com/products/kd-soap"
     TYPE REQUIRED
@@ -43,7 +49,7 @@ set_package_properties(KDSoap PROPERTIES
 )
 
 if (BUILD_TESTING)
-    find_package(Qt5 ${REQUIRED_QT_VERSION} CONFIG REQUIRED Test)
+    find_package(Qt${QT_MAJOR_VERSION} ${REQUIRED_QT_VERSION} CONFIG REQUIRED Test)
 endif()
 
 include(ECMSetupVersion)
