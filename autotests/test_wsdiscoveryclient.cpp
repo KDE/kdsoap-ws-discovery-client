@@ -17,6 +17,7 @@
 
 #include <KDSoapClient/KDQName>
 #include <QNetworkDatagram>
+#include <QRegularExpression>
 #include <QSignalSpy>
 #include <QTest>
 #include <QUdpSocket>
@@ -285,7 +286,7 @@ QByteArray testWSDiscoveryClient::formatXml(const QByteArray& original)
 QByteArray testWSDiscoveryClient::zeroOutUuid(const QByteArray& original)
 {
     QString originalString = original;
-    originalString.replace(QRegExp("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"), QStringLiteral("00000000-0000-0000-0000-000000000000"));
+    originalString.replace(QRegularExpression("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"), QStringLiteral("00000000-0000-0000-0000-000000000000"));
     return originalString.toLatin1();
 }
 
