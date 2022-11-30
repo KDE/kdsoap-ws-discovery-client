@@ -20,10 +20,12 @@
 #include "wsdiscoveryclient_export.h"
 #include <QHash>
 #include <QObject>
+#include <QUrl>
+
+#include <KDSoapClient/KDQName>
 
 class KDSoapHeaders;
 class KDSoapMessage;
-class KDQName;
 class KDSoapUdpClient;
 class QHostAddress;
 class WSDiscoveryTargetService;
