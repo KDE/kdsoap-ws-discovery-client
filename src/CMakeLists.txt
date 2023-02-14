@@ -49,7 +49,7 @@ target_include_directories(KDSoapWSDiscoveryClient
 
 target_link_libraries(KDSoapWSDiscoveryClient
     PUBLIC
-        Qt5::Core
+        Qt::Core
         KDSoap::kdsoap
     PRIVATE
 )
@@ -91,7 +91,7 @@ if(BUILD_QCH)
             ${KDSoapWSDiscoveryClient_HEADERS}
         MD_MAINPAGE "${CMAKE_SOURCE_DIR}/README.md"
         LINK_QCHS
-            Qt5Core_QCH
+            Qt${QT_MAJOR_VERSION}Core_QCH
             KDSoap_QCH
         BLANK_MACROS
             KARCHIVE_EXPORT
