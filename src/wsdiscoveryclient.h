@@ -20,10 +20,18 @@
 #include "wsdiscoveryclient_export.h"
 #include <QHash>
 #include <QObject>
+#include <QUrl>
+
+#include <KDSoapClient/KDQName>
+
+#include "KDSoapClient/kdsoap_version.h"
+
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)) && (KDSOAP_VERSION <= KDSOAP_VERSION_CHECK(2, 1, 1))
+WSDISCOVERYCLIENT_EXPORT QDebug operator<<(QDebug dbg, const KDQName &qn);
+#endif
 
 class KDSoapHeaders;
 class KDSoapMessage;
-class KDQName;
 class KDSoapUdpClient;
 class QHostAddress;
 class WSDiscoveryTargetService;

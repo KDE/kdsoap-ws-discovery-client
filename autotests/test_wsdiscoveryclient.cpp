@@ -21,6 +21,8 @@
 #include <QTest>
 #include <QUdpSocket>
 #include <QXmlStreamReader>
+#include <QRegularExpression>
+
 #include "wsdiscoveryclient.h"
 #include "wsdiscoverytargetservice.h"
 
@@ -285,7 +287,8 @@ QByteArray testWSDiscoveryClient::formatXml(const QByteArray& original)
 QByteArray testWSDiscoveryClient::zeroOutUuid(const QByteArray& original)
 {
     QString originalString = original;
-    originalString.replace(QRegExp("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"), QStringLiteral("00000000-0000-0000-0000-000000000000"));
+    static QRegularExpression regExp(QStringLiteral("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"));
+    originalString.replace(regExp, QStringLiteral("00000000-0000-0000-0000-000000000000"));
     return originalString.toLatin1();
 }
 

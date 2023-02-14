@@ -24,7 +24,6 @@
 #include <KDSoapClient/KDSoapUdpClient>
 #include <QHostAddress>
 #include <QTimer>
-#include <QUrl>
 #include <QUuid>
 
 #include "wsdl_wsdd-discovery-1.h"
@@ -33,6 +32,17 @@
 static const int DISCOVERY_PORT = 3702;
 #define DISCOVERY_ADDRESS_IPV4 (QHostAddress(QStringLiteral("239.255.255.250")))
 #define DISCOVERY_ADDRESS_IPV6 (QHostAddress(QStringLiteral("FF02::C")))
+
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)) && (KDSOAP_VERSION <= KDSOAP_VERSION_CHECK(2, 1, 1))
+QDebug operator<<(QDebug dbg, const KDQName &qn)
+{
+    if (!qn.nameSpace().isEmpty())
+        dbg << "(" << qn.nameSpace() << "," << qn.localName() << ")";
+    else
+        dbg << qn.qname();
+    return dbg;
+}
+#endif
 
 WSDiscoveryClient::WSDiscoveryClient(QObject *parent) :
     QObject(parent)
