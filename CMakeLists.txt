@@ -15,6 +15,8 @@ include(CTest)
 include(KDEInstallDirs)
 include(KDECompilerSettings NO_POLICY_SCOPE)
 include(KDECMakeSettings)
+include(KDEClangFormat)
+include(KDEGitCommitHooks)
 
 include(GenerateExportHeader)
 
@@ -99,6 +101,9 @@ install(EXPORT KDSoapWSDiscoveryClientTargets
         FILE KDSoapWSDiscoveryClientTargets.cmake
         NAMESPACE KDSoap::)
 
+file(GLOB_RECURSE ALL_CLANG_FORMAT_SOURCE_FILES *.cpp *.h)
+kde_clang_format(${ALL_CLANG_FORMAT_SOURCE_FILES})
+kde_configure_git_pre_commit_hook(CHECKS CLANG_FORMAT)
 
 feature_summary(
     WHAT ALL
