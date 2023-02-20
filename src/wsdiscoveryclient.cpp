@@ -55,7 +55,7 @@ WSDiscoveryClient::~WSDiscoveryClient() = default;
 
 void WSDiscoveryClient::start()
 {
-    bool rc = m_soapUdpClient->bind(DISCOVERY_PORT, QAbstractSocket::ShareAddress);
+    bool rc = m_soapUdpClient->bind(0, QAbstractSocket::DefaultForPlatform);
     Q_ASSERT(rc);
 }
 
