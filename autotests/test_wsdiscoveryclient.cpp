@@ -17,6 +17,8 @@
 
 Q_DECLARE_METATYPE(WSDiscoveryTargetService)
 
+static constexpr auto clientPort = 15744;
+
 class testWSDiscoveryClient : public QObject
 {
     Q_OBJECT
@@ -142,7 +144,7 @@ QByteArray testWSDiscoveryClient::expectedSendResolveData()
 void testWSDiscoveryClient::testReceiveProbeMatch()
 {
     WSDiscoveryClient discoveryClient;
-    discoveryClient.start();
+    discoveryClient.start(clientPort);
 
     qRegisterMetaType<WSDiscoveryTargetService>();
     QSignalSpy spy(&discoveryClient, &WSDiscoveryClient::probeMatchReceived);
@@ -154,7 +156,7 @@ void testWSDiscoveryClient::testReceiveProbeMatch()
     for (const auto &iface : ifaces) {
         QVERIFY(testSocket.joinMulticastGroup(QHostAddress(QStringLiteral("FF02::C")), iface));
     }
-    testSocket.writeDatagram(toBeSendProbeMatchData(), QHostAddress(QStringLiteral("FF02::C")), 3702);
+    testSocket.writeDatagram(toBeSendProbeMatchData(), QHostAddress::LocalHost, clientPort);
 
     QVERIFY(spy.wait(1000));
 
@@ -208,7 +210,7 @@ QByteArray testWSDiscoveryClient::toBeSendProbeMatchData()
 void testWSDiscoveryClient::testReceiveResolveMatch()
 {
     WSDiscoveryClient discoveryClient;
-    discoveryClient.start();
+    discoveryClient.start(clientPort);
 
     qRegisterMetaType<WSDiscoveryTargetService>();
     QSignalSpy spy(&discoveryClient, &WSDiscoveryClient::resolveMatchReceived);
@@ -220,7 +222,7 @@ void testWSDiscoveryClient::testReceiveResolveMatch()
     for (const auto &iface : ifaces) {
         QVERIFY(testSocket.joinMulticastGroup(QHostAddress(QStringLiteral("FF02::C")), iface));
     }
-    testSocket.writeDatagram(toBeSendResolveMatchData(), QHostAddress(QStringLiteral("FF02::C")), 3702);
+    testSocket.writeDatagram(toBeSendResolveMatchData(), QHostAddress::LocalHost, clientPort);
 
     QVERIFY(spy.wait(1000));
 

@@ -1,7 +1,7 @@
-/* SPDX-FileCopyrightText: 2019 Casper Meijn <casper@meijn.net>
- * SPDX-License-Identifier: GPL-3.0-or-later
- *
- */
+// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-FileCopyrightText: 2019 Casper Meijn <casper@meijn.net>
+// SPDX-FileCopyrightText: 2023 Harald Sitter <sitter@kde.org>
+
 #include "wsdiscoveryclient.h"
 
 #include "loggingcategory.h"
@@ -41,9 +41,9 @@ WSDiscoveryClient::WSDiscoveryClient(QObject *parent)
 
 WSDiscoveryClient::~WSDiscoveryClient() = default;
 
-void WSDiscoveryClient::start()
+void WSDiscoveryClient::start(quint16 port)
 {
-    bool rc = m_soapUdpClient->bind(0, QAbstractSocket::DefaultForPlatform);
+    bool rc = m_soapUdpClient->bind(port, QAbstractSocket::DefaultForPlatform);
     Q_ASSERT(rc);
 }
 

@@ -1,7 +1,7 @@
-/* SPDX-FileCopyrightText: 2019 Casper Meijn <casper@meijn.net>
- * SPDX-License-Identifier: GPL-3.0-or-later
- *
- */
+// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-FileCopyrightText: 2019 Casper Meijn <casper@meijn.net>
+// SPDX-FileCopyrightText: 2023 Harald Sitter <sitter@kde.org>
+
 #ifndef WSDISCOVERYCLIENT_H
 #define WSDISCOVERYCLIENT_H
 
@@ -63,9 +63,10 @@ public slots:
     /*!
      * Bind to the WS-Discovery network ports. After binding messages will be
      * received. It binds on both IPv4 and IPv6.
+     * @param port the port to bind or 0 to pick a random port
      */
     // TODO: Rename to bind()
-    void start();
+    void start(quint16 port = 0);
 
     /*!
      * Send a WS-Discovery probe message. This will cause all devices in the network
