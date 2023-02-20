@@ -5,40 +5,43 @@
 
 #include <KDSoapClient/KDQName>
 #include <QNetworkDatagram>
+#include <QRegularExpression>
 #include <QSignalSpy>
 #include <QTest>
 #include <QUdpSocket>
 #include <QXmlStreamReader>
-#include <QRegularExpression>
 
 #include "wsdiscoveryclient.h"
 #include "wsdiscoverytargetservice.h"
 
 Q_DECLARE_METATYPE(WSDiscoveryTargetService)
 
-class testWSDiscoveryClient: public QObject
+class testWSDiscoveryClient : public QObject
 {
     Q_OBJECT
 public:
-    explicit testWSDiscoveryClient(QObject* parent = nullptr) :
-        QObject(parent) {;}
-        
+    explicit testWSDiscoveryClient(QObject *parent = nullptr)
+        : QObject(parent)
+    {
+        ;
+    }
+
 private slots:
     static void testSendProbe();
     static void testSendResolve();
     static void testReceiveProbeMatch();
     static void testReceiveResolveMatch();
-    
+
 private:
-    static QByteArray zeroOutUuid(const QByteArray& original);
+    static QByteArray zeroOutUuid(const QByteArray &original);
     static QByteArray expectedSendProbeData();
     static QByteArray expectedSendResolveData();
     static QByteArray toBeSendProbeMatchData();
     static QByteArray toBeSendResolveMatchData();
-    static QByteArray formatXml(const QByteArray& original);
+    static QByteArray formatXml(const QByteArray &original);
 };
 
-void testWSDiscoveryClient::testSendProbe() 
+void testWSDiscoveryClient::testSendProbe()
 {
     QUdpSocket testSocket;
     QVERIFY(testSocket.bind(QHostAddress::Any, 3702, QAbstractSocket::ShareAddress));
@@ -47,9 +50,9 @@ void testWSDiscoveryClient::testSendProbe()
     KDQName type(QStringLiteral("tdn:NetworkVideoTransmitter"));
     type.setNameSpace(QStringLiteral("http://www.onvif.org/ver10/network/wsdl"));
     auto typeList = QList<KDQName>() << type;
-    
+
     auto scopeList = QList<QUrl>() << QUrl(QStringLiteral("onvif://www.onvif.org/Profile/Streaming"));
-    
+
     WSDiscoveryClient discoveryClient;
     discoveryClient.start();
     discoveryClient.sendProbe(typeList, scopeList);
@@ -60,7 +63,8 @@ void testWSDiscoveryClient::testSendProbe()
     QCOMPARE(formatXml(zeroedDatagram), formatXml(expectedSendProbeData()));
 }
 
-QByteArray testWSDiscoveryClient::expectedSendProbeData() {
+QByteArray testWSDiscoveryClient::expectedSendProbeData()
+{
     return QByteArray(
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
         "<soap:Envelope"
@@ -85,7 +89,7 @@ QByteArray testWSDiscoveryClient::expectedSendProbeData() {
         "</soap:Envelope>");
 }
 
-void testWSDiscoveryClient::testSendResolve() 
+void testWSDiscoveryClient::testSendResolve()
 {
     QUdpSocket testSocket;
     QVERIFY(testSocket.bind(QHostAddress::Any, 3702, QAbstractSocket::ShareAddress));
@@ -101,7 +105,8 @@ void testWSDiscoveryClient::testSendResolve()
     QCOMPARE(formatXml(zeroedDatagram), formatXml(expectedSendResolveData()));
 }
 
-QByteArray testWSDiscoveryClient::expectedSendResolveData() {
+QByteArray testWSDiscoveryClient::expectedSendResolveData()
+{
     return QByteArray(
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
         "<soap:Envelope"
@@ -127,26 +132,26 @@ QByteArray testWSDiscoveryClient::expectedSendResolveData() {
         "</soap:Envelope>");
 }
 
-void testWSDiscoveryClient::testReceiveProbeMatch() 
+void testWSDiscoveryClient::testReceiveProbeMatch()
 {
     WSDiscoveryClient discoveryClient;
     discoveryClient.start();
-    
+
     qRegisterMetaType<WSDiscoveryTargetService>();
     QSignalSpy spy(&discoveryClient, &WSDiscoveryClient::probeMatchReceived);
     QVERIFY(spy.isValid());
-    
+
     QUdpSocket testSocket;
     QVERIFY(testSocket.bind(QHostAddress::Any, 3702, QAbstractSocket::ShareAddress));
     QVERIFY(testSocket.joinMulticastGroup(QHostAddress(QStringLiteral("FF02::C"))));
     testSocket.writeDatagram(toBeSendProbeMatchData(), QHostAddress(QStringLiteral("FF02::C")), 3702);
-    
+
     QVERIFY(spy.wait(1000));
-    
+
     QCOMPARE(spy.count(), 1); // make sure the signal was emitted exactly one time
     QList<QVariant> arguments = spy.takeFirst(); // take the first signal
-    
-    const WSDiscoveryTargetService& probeMatchService = qvariant_cast<WSDiscoveryTargetService>(arguments.at(0));
+
+    const WSDiscoveryTargetService &probeMatchService = qvariant_cast<WSDiscoveryTargetService>(arguments.at(0));
 
     QCOMPARE(probeMatchService.endpointReference(), "Incomming_unique_reference");
     QCOMPARE(probeMatchService.scopeList().size(), 1);
@@ -190,26 +195,26 @@ QByteArray testWSDiscoveryClient::toBeSendProbeMatchData()
         "</soap:Envelope>");
 }
 
-void testWSDiscoveryClient::testReceiveResolveMatch() 
+void testWSDiscoveryClient::testReceiveResolveMatch()
 {
     WSDiscoveryClient discoveryClient;
     discoveryClient.start();
-    
+
     qRegisterMetaType<WSDiscoveryTargetService>();
     QSignalSpy spy(&discoveryClient, &WSDiscoveryClient::resolveMatchReceived);
     QVERIFY(spy.isValid());
-    
+
     QUdpSocket testSocket;
     QVERIFY(testSocket.bind(QHostAddress::Any, 3702, QAbstractSocket::ShareAddress));
     QVERIFY(testSocket.joinMulticastGroup(QHostAddress(QStringLiteral("FF02::C"))));
     testSocket.writeDatagram(toBeSendResolveMatchData(), QHostAddress(QStringLiteral("FF02::C")), 3702);
-    
+
     QVERIFY(spy.wait(1000));
-    
+
     QCOMPARE(spy.count(), 1); // make sure the signal was emitted exactly one time
     QList<QVariant> arguments = spy.takeFirst(); // take the first signal
-    
-    const WSDiscoveryTargetService& probeMatchService = qvariant_cast<WSDiscoveryTargetService>(arguments.at(0));
+
+    const WSDiscoveryTargetService &probeMatchService = qvariant_cast<WSDiscoveryTargetService>(arguments.at(0));
 
     QCOMPARE(probeMatchService.endpointReference(), "Incomming_resolve_reference");
     QCOMPARE(probeMatchService.scopeList().size(), 1);
@@ -253,8 +258,7 @@ QByteArray testWSDiscoveryClient::toBeSendResolveMatchData()
         "</soap:Envelope>");
 }
 
-
-QByteArray testWSDiscoveryClient::formatXml(const QByteArray& original)
+QByteArray testWSDiscoveryClient::formatXml(const QByteArray &original)
 {
     QByteArray xmlOut;
 
@@ -272,7 +276,7 @@ QByteArray testWSDiscoveryClient::formatXml(const QByteArray& original)
     return xmlOut;
 }
 
-QByteArray testWSDiscoveryClient::zeroOutUuid(const QByteArray& original)
+QByteArray testWSDiscoveryClient::zeroOutUuid(const QByteArray &original)
 {
     QString originalString = original;
     static QRegularExpression regExp(QStringLiteral("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"));

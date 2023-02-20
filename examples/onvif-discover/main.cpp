@@ -2,10 +2,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
  */
+#include "onvifdiscover.h"
 #include <QCoreApplication>
 #include <QDebug>
 #include <QTimer>
-#include "onvifdiscover.h"
 
 Q_DECL_EXPORT int main(int argc, char *argv[])
 {

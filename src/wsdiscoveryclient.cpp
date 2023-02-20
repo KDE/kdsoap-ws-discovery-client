@@ -14,8 +14,8 @@
 #include <QTimer>
 #include <QUuid>
 
-#include "wsdl_wsdd-discovery-1.h"
 #include "wsdl_ws-discovery.h"
+#include "wsdl_wsdd-discovery-1.h"
 
 static const int DISCOVERY_PORT = 3702;
 #define DISCOVERY_ADDRESS_IPV4 (QHostAddress(QStringLiteral("239.255.255.250")))
@@ -32,8 +32,8 @@ QDebug operator<<(QDebug dbg, const KDQName &qn)
 }
 #endif
 
-WSDiscoveryClient::WSDiscoveryClient(QObject *parent) :
-    QObject(parent)
+WSDiscoveryClient::WSDiscoveryClient(QObject *parent)
+    : QObject(parent)
 {
     m_soapUdpClient = new KDSoapUdpClient(this);
     connect(m_soapUdpClient, &KDSoapUdpClient::receivedMessage, this, &WSDiscoveryClient::receivedMessage);
@@ -50,12 +50,12 @@ void WSDiscoveryClient::start()
 void WSDiscoveryClient::sendProbe(const QList<KDQName> &typeList, const QList<QUrl> &scopeList)
 {
     WSDiscovery200504::TNS__ProbeType probe;
-    if(!typeList.isEmpty()) {
+    if (!typeList.isEmpty()) {
         WSDiscovery200504::TNS__QNameListType types;
         types.setEntries(typeList);
         probe.setTypes(types);
     }
-    if(!scopeList.isEmpty()) {
+    if (!scopeList.isEmpty()) {
         WSDiscovery200504::TNS__UriListType scopeValues;
         scopeValues.setEntries(QUrl::toStringList(scopeList));
         WSDiscovery200504::TNS__ScopesType scopes;
@@ -119,34 +119,37 @@ void WSDiscoveryClient::sendResolve(const QString &endpointReferenceString)
     Q_ASSERT(rc);
 }
 
-void WSDiscoveryClient::receivedMessage(const KDSoapMessage &replyMessage, const KDSoapHeaders &replyHeaders, const QHostAddress &senderAddress, quint16 senderPort)
+void WSDiscoveryClient::receivedMessage(const KDSoapMessage &replyMessage,
+                                        const KDSoapHeaders &replyHeaders,
+                                        const QHostAddress &senderAddress,
+                                        quint16 senderPort)
 {
     Q_UNUSED(replyHeaders);
     Q_UNUSED(senderAddress);
     Q_UNUSED(senderPort);
-    if(replyMessage.messageAddressingProperties().action() == QStringLiteral("http://schemas.xmlsoap.org/ws/2005/04/discovery/Probe")) {
+    if (replyMessage.messageAddressingProperties().action() == QStringLiteral("http://schemas.xmlsoap.org/ws/2005/04/discovery/Probe")) {
         // NO-OP
-    } else if(replyMessage.messageAddressingProperties().action() == QStringLiteral("http://schemas.xmlsoap.org/ws/2005/04/discovery/Resolve")) {
+    } else if (replyMessage.messageAddressingProperties().action() == QStringLiteral("http://schemas.xmlsoap.org/ws/2005/04/discovery/Resolve")) {
         // NO-OP
-    } else if(replyMessage.messageAddressingProperties().action() == QStringLiteral("http://schemas.xmlsoap.org/ws/2005/04/discovery/ResolveMatches")) {
+    } else if (replyMessage.messageAddressingProperties().action() == QStringLiteral("http://schemas.xmlsoap.org/ws/2005/04/discovery/ResolveMatches")) {
         WSDiscovery200504::TNS__ResolveMatchesType resolveMatches;
         resolveMatches.deserialize(replyMessage);
 
         auto resolveMatch = resolveMatches.resolveMatch();
-        const QString& endpointReference = resolveMatch.endpointReference().address();
+        const QString &endpointReference = resolveMatch.endpointReference().address();
         auto service = WSDiscoveryTargetService(endpointReference);
         service.setTypeList(resolveMatch.types().entries());
         service.setScopeList(QUrl::fromStringList(resolveMatch.scopes().value().entries()));
         service.setXAddrList(QUrl::fromStringList(resolveMatch.xAddrs().entries()));
         service.updateLastSeen();
         emit resolveMatchReceived(service);
-    } else if(replyMessage.messageAddressingProperties().action() == QStringLiteral("http://schemas.xmlsoap.org/ws/2005/04/discovery/ProbeMatches")) {
+    } else if (replyMessage.messageAddressingProperties().action() == QStringLiteral("http://schemas.xmlsoap.org/ws/2005/04/discovery/ProbeMatches")) {
         WSDiscovery200504::TNS__ProbeMatchesType probeMatches;
         probeMatches.deserialize(replyMessage);
 
-        const QList<WSDiscovery200504::TNS__ProbeMatchType>& probeMatchList = probeMatches.probeMatch();
-        for(const WSDiscovery200504::TNS__ProbeMatchType& probeMatch : probeMatchList) {
-            const QString& endpointReference = probeMatch.endpointReference().address();
+        const QList<WSDiscovery200504::TNS__ProbeMatchType> &probeMatchList = probeMatches.probeMatch();
+        for (const WSDiscovery200504::TNS__ProbeMatchType &probeMatch : probeMatchList) {
+            const QString &endpointReference = probeMatch.endpointReference().address();
             auto service = WSDiscoveryTargetService(endpointReference);
             service.setTypeList(probeMatch.types().entries());
             service.setScopeList(QUrl::fromStringList(probeMatch.scopes().value().entries()));
@@ -158,4 +161,3 @@ void WSDiscoveryClient::receivedMessage(const KDSoapMessage &replyMessage, const
         qCDebug(KDSoapWSDiscoveryClient) << "Received message with unknown action:" << replyMessage.messageAddressingProperties().action();
     }
 }
-

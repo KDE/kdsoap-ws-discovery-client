@@ -6,7 +6,7 @@
 
 class WSDiscoveryTargetServiceData : public QSharedData
 {
-  public:
+public:
     QString endpointReference;
     QList<KDQName> typeList;
     QList<QUrl> scopeList;
@@ -45,9 +45,8 @@ void WSDiscoveryTargetService::updateLastSeen()
 
 bool WSDiscoveryTargetService::isMatchingType(const KDQName &matchingType) const
 {
-    for(const KDQName &type : d->typeList) {
-        if(matchingType.nameSpace() == type.nameSpace() &&
-                matchingType.localName() == type.localName()) {
+    for (const KDQName &type : d->typeList) {
+        if (matchingType.nameSpace() == type.nameSpace() && matchingType.localName() == type.localName()) {
             return true;
         }
     }
@@ -56,8 +55,8 @@ bool WSDiscoveryTargetService::isMatchingType(const KDQName &matchingType) const
 
 bool WSDiscoveryTargetService::isMatchingScope(const QUrl &matchingScope) const
 {
-    for(const QUrl &scope : d->scopeList) {
-        if(matchingScope == scope) {
+    for (const QUrl &scope : d->scopeList) {
+        if (matchingScope == scope) {
             return true;
         }
     }
@@ -99,8 +98,7 @@ QString WSDiscoveryTargetService::endpointReference() const
     return d->endpointReference;
 }
 
-void WSDiscoveryTargetService::setEndpointReference(const QString& endpointReference)
+void WSDiscoveryTargetService::setEndpointReference(const QString &endpointReference)
 {
     d->endpointReference = endpointReference;
 }
-

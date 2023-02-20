@@ -23,12 +23,12 @@ public slots:
     void start();
 
 private slots:
-    void matchReceived(const QSharedPointer<WSDiscoveryTargetService>& matchedService);
+    void matchReceived(const QSharedPointer<WSDiscoveryTargetService> &matchedService);
 
 private:
-    WSDiscoveryClient * m_client;
-    WSDiscoveryProbeJob * m_probeJob;
-    WSDiscoveryServiceAggregator * m_aggregator;
+    WSDiscoveryClient *m_client;
+    WSDiscoveryProbeJob *m_probeJob;
+    WSDiscoveryServiceAggregator *m_aggregator;
 };
 
 #endif // ONVIFDISCOVER_H

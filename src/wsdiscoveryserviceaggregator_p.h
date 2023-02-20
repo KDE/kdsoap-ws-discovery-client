@@ -6,9 +6,9 @@
 #ifndef WSDISCOVERYSERVICEAGGREGATOR_P_H
 #define WSDISCOVERYSERVICEAGGREGATOR_P_H
 
-#include <QSharedPointer>
-#include <QObject>
 #include "wsdiscoverytargetservice.h"
+#include <QObject>
+#include <QSharedPointer>
 
 class WSDiscoveryServiceAggregatorPrivate
 {

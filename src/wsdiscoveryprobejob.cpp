@@ -10,9 +10,9 @@
 #include <QDebug>
 #include <QSharedPointer>
 
-WSDiscoveryProbeJob::WSDiscoveryProbeJob(WSDiscoveryClient *parent) :
-    QObject(parent),
-    m_client(parent)
+WSDiscoveryProbeJob::WSDiscoveryProbeJob(WSDiscoveryClient *parent)
+    : QObject(parent)
+    , m_client(parent)
 {
     connect(m_client, &WSDiscoveryClient::probeMatchReceived, this, &WSDiscoveryProbeJob::probeMatchReceived);
 
@@ -79,13 +79,13 @@ void WSDiscoveryProbeJob::timeout()
 void WSDiscoveryProbeJob::probeMatchReceived(const WSDiscoveryTargetService &probeMatchService)
 {
     bool isMatch = true;
-    for(const KDQName& type : qAsConst(m_typeList)) {
+    for (const KDQName &type : qAsConst(m_typeList)) {
         isMatch = probeMatchService.isMatchingType(type) && isMatch;
     }
-    for(const QUrl& scope : qAsConst(m_scopeList)) {
+    for (const QUrl &scope : qAsConst(m_scopeList)) {
         isMatch = probeMatchService.isMatchingScope(scope) && isMatch;
     }
-    if(isMatch) {
+    if (isMatch) {
         emit matchReceived(probeMatchService);
     } else {
         qCDebug(KDSoapWSDiscoveryClient) << "Received probe match that didn't match the probe job";

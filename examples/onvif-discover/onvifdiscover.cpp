@@ -8,20 +8,21 @@
 #include <QSharedPointer>
 #include <WSDiscoveryClient>
 #include <WSDiscoveryProbeJob>
-#include <WSDiscoveryTargetService>
 #include <WSDiscoveryServiceAggregator>
+#include <WSDiscoveryTargetService>
 
-OnvifDiscover::OnvifDiscover(QObject *parent) : QObject(parent)
+OnvifDiscover::OnvifDiscover(QObject *parent)
+    : QObject(parent)
 {
     m_client = new WSDiscoveryClient(this);
 
     m_probeJob = new WSDiscoveryProbeJob(m_client);
-    
+
     m_aggregator = new WSDiscoveryServiceAggregator(this);
-    
+
     connect(m_probeJob, &WSDiscoveryProbeJob::matchReceived, m_aggregator, &WSDiscoveryServiceAggregator::updateService);
     connect(m_aggregator, &WSDiscoveryServiceAggregator::serviceUpdated, this, &OnvifDiscover::matchReceived);
-    
+
     KDQName type("tdn:NetworkVideoTransmitter");
     type.setNameSpace("http://www.onvif.org/ver10/network/wsdl");
     m_probeJob->addType(type);
@@ -39,16 +40,16 @@ void OnvifDiscover::matchReceived(const QSharedPointer<WSDiscoveryTargetService>
 {
     qDebug() << "ProbeMatch received:";
     qDebug() << "  Endpoint reference:" << matchedService->endpointReference();
-    const auto& typeList = matchedService->typeList();
-    for(const auto& type : typeList) {
-        qDebug() << "  Type:"  << type.localName() << "in namespace" << type.nameSpace();
+    const auto &typeList = matchedService->typeList();
+    for (const auto &type : typeList) {
+        qDebug() << "  Type:" << type.localName() << "in namespace" << type.nameSpace();
     }
-    const auto& scopeList = matchedService->scopeList();
-    for(const auto& scope : scopeList) {
-        qDebug() << "  Scope:"  << scope.toString();
+    const auto &scopeList = matchedService->scopeList();
+    for (const auto &scope : scopeList) {
+        qDebug() << "  Scope:" << scope.toString();
     }
-    const auto& xAddrList = matchedService->xAddrList();
-    for(const auto& xAddr : xAddrList) {
+    const auto &xAddrList = matchedService->xAddrList();
+    for (const auto &xAddr : xAddrList) {
         qDebug() << "  XAddr:" << xAddr.toString();
     }
 }

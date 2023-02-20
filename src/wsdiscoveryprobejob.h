@@ -7,18 +7,18 @@
 
 #include "wsdiscoveryclient_export.h"
 #include <KDSoapClient/KDQName>
+#include <QObject>
 #include <QTimer>
 #include <QUrl>
-#include <QObject>
 
 class WSDiscoveryClient;
 class WSDiscoveryTargetService;
 
 /*!
  * \brief Periodically probe the network for WS-Discovery devices.
- * 
- * You can set a filter for interested types and scopes, only devices that match 
- * the filter will be reported. After starting it will probe the network and 
+ *
+ * You can set a filter for interested types and scopes, only devices that match
+ * the filter will be reported. After starting it will probe the network and
  * report any matches.
  */
 class WSDISCOVERYCLIENT_EXPORT WSDiscoveryProbeJob : public QObject
@@ -27,7 +27,7 @@ class WSDISCOVERYCLIENT_EXPORT WSDiscoveryProbeJob : public QObject
 public:
     /*!
      * Creates a WSDiscoveryProbeJob
-     * \param parent is both the QObject parent as the WSDiscoveryClient 
+     * \param parent is both the QObject parent as the WSDiscoveryClient
      *   used for sending and receiving messages
      */
     explicit WSDiscoveryProbeJob(WSDiscoveryClient *parent);
@@ -43,7 +43,7 @@ public:
     /*!
      * \param type Adds a type to the list to filter devices with
      */
-    void addType(const KDQName& type);
+    void addType(const KDQName &type);
 
     /*!
      * \return List of scopes to filter devices with
@@ -56,7 +56,7 @@ public:
     /*!
      * \param scope Adds a scopes to the list to filter devices with
      */
-    void addScope(const QUrl& scope);
+    void addScope(const QUrl &scope);
 
     /*!
      * \return The interval between probes
@@ -72,25 +72,25 @@ signals:
      * Emitted when a match is received
      * \param matchedService The service as described in the match
      */
-    void matchReceived(const WSDiscoveryTargetService& matchedService);
+    void matchReceived(const WSDiscoveryTargetService &matchedService);
 
 public slots:
     /*!
-     * Start sending periodic probes 
+     * Start sending periodic probes
      */
     void start();
     /*!
-     * Stop sending periodic probes 
+     * Stop sending periodic probes
      */
     void stop();
 
-//TODO: Hide private interface
+    // TODO: Hide private interface
 private slots:
     void timeout();
-    void probeMatchReceived(const WSDiscoveryTargetService& probeMatchService);
+    void probeMatchReceived(const WSDiscoveryTargetService &probeMatchService);
 
 private:
-    WSDiscoveryClient * m_client;
+    WSDiscoveryClient *m_client;
     QList<KDQName> m_typeList;
     QList<QUrl> m_scopeList;
     QTimer m_timer;
