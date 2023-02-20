@@ -1,10 +1,11 @@
-/* SPDX-FileCopyrightText: 2019-2020 Casper Meijn <casper@meijn.net>
- * SPDX-License-Identifier: GPL-3.0-or-later
- *
- */
+
+// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-FileCopyrightText: 2019-2020 Casper Meijn <casper@meijn.net>
+// SPDX-FileCopyrightText: 2023 Harald Sitter <sitter@kde.org>
 
 #include <KDSoapClient/KDQName>
 #include <QNetworkDatagram>
+#include <QNetworkInterface>
 #include <QRegularExpression>
 #include <QSignalSpy>
 #include <QTest>
@@ -45,7 +46,10 @@ void testWSDiscoveryClient::testSendProbe()
 {
     QUdpSocket testSocket;
     QVERIFY(testSocket.bind(QHostAddress::Any, 3702, QAbstractSocket::ShareAddress));
-    QVERIFY(testSocket.joinMulticastGroup(QHostAddress(QStringLiteral("FF02::C"))));
+    const auto ifaces = QNetworkInterface::allInterfaces();
+    for (const auto &iface : ifaces) {
+        QVERIFY(testSocket.joinMulticastGroup(QHostAddress(QStringLiteral("FF02::C")), iface));
+    }
 
     KDQName type(QStringLiteral("tdn:NetworkVideoTransmitter"));
     type.setNameSpace(QStringLiteral("http://www.onvif.org/ver10/network/wsdl"));
@@ -93,7 +97,10 @@ void testWSDiscoveryClient::testSendResolve()
 {
     QUdpSocket testSocket;
     QVERIFY(testSocket.bind(QHostAddress::Any, 3702, QAbstractSocket::ShareAddress));
-    QVERIFY(testSocket.joinMulticastGroup(QHostAddress(QStringLiteral("FF02::C"))));
+    const auto ifaces = QNetworkInterface::allInterfaces();
+    for (const auto &iface : ifaces) {
+        QVERIFY(testSocket.joinMulticastGroup(QHostAddress(QStringLiteral("FF02::C")), iface));
+    }
 
     WSDiscoveryClient discoveryClient;
     discoveryClient.start();
@@ -143,7 +150,10 @@ void testWSDiscoveryClient::testReceiveProbeMatch()
 
     QUdpSocket testSocket;
     QVERIFY(testSocket.bind(QHostAddress::Any, 3702, QAbstractSocket::ShareAddress));
-    QVERIFY(testSocket.joinMulticastGroup(QHostAddress(QStringLiteral("FF02::C"))));
+    const auto ifaces = QNetworkInterface::allInterfaces();
+    for (const auto &iface : ifaces) {
+        QVERIFY(testSocket.joinMulticastGroup(QHostAddress(QStringLiteral("FF02::C")), iface));
+    }
     testSocket.writeDatagram(toBeSendProbeMatchData(), QHostAddress(QStringLiteral("FF02::C")), 3702);
 
     QVERIFY(spy.wait(1000));
@@ -206,7 +216,10 @@ void testWSDiscoveryClient::testReceiveResolveMatch()
 
     QUdpSocket testSocket;
     QVERIFY(testSocket.bind(QHostAddress::Any, 3702, QAbstractSocket::ShareAddress));
-    QVERIFY(testSocket.joinMulticastGroup(QHostAddress(QStringLiteral("FF02::C"))));
+    const auto ifaces = QNetworkInterface::allInterfaces();
+    for (const auto &iface : ifaces) {
+        QVERIFY(testSocket.joinMulticastGroup(QHostAddress(QStringLiteral("FF02::C")), iface));
+    }
     testSocket.writeDatagram(toBeSendResolveMatchData(), QHostAddress(QStringLiteral("FF02::C")), 3702);
 
     QVERIFY(spy.wait(1000));
