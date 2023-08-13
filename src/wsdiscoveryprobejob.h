@@ -67,14 +67,14 @@ public:
      */
     void setInterval(int interval);
 
-signals:
+Q_SIGNALS:
     /*!
      * Emitted when a match is received
      * \param matchedService The service as described in the match
      */
     void matchReceived(const WSDiscoveryTargetService &matchedService);
 
-public slots:
+public Q_SLOTS:
     /*!
      * Start sending periodic probes
      */
@@ -85,7 +85,7 @@ public slots:
     void stop();
 
     // TODO: Hide private interface
-private slots:
+private Q_SLOTS:
     void timeout();
     void probeMatchReceived(const WSDiscoveryTargetService &probeMatchService);
 

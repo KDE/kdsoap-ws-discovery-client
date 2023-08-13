@@ -35,7 +35,7 @@ public:
      */
     ~WSDiscoveryServiceAggregator();
 
-signals:
+Q_SIGNALS:
     /*!
      * Emitted when a service has new information. The service instance is
      * reused, when a new update is received. Therefore you can compare the
@@ -44,7 +44,7 @@ signals:
      */
     void serviceUpdated(const QSharedPointer<WSDiscoveryTargetService> &updatedService);
 
-public slots:
+public Q_SLOTS:
     /*!
      * Provides a new service update.
      * \param receivedService The service with updated information

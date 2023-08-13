@@ -19,10 +19,10 @@ public:
     explicit OnvifDiscover(QObject *parent = nullptr);
     ~OnvifDiscover();
 
-public slots:
+public Q_SLOTS:
     void start();
 
-private slots:
+private Q_SLOTS:
     void matchReceived(const QSharedPointer<WSDiscoveryTargetService> &matchedService);
 
 private:

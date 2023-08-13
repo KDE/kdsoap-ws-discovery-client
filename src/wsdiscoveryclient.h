@@ -44,7 +44,7 @@ public:
     explicit WSDiscoveryClient(QObject *parent = nullptr);
     ~WSDiscoveryClient();
 
-signals:
+Q_SIGNALS:
     /*!
      * Emitted when a WS-Discovery probe match message is received. When a single message is reveived
      * with multiple matches, then multiple signals are emitted.
@@ -59,7 +59,7 @@ signals:
     // TODO: Rename parameter
     void resolveMatchReceived(const WSDiscoveryTargetService &probeMatchService);
 
-public slots:
+public Q_SLOTS:
     /*!
      * Bind to the WS-Discovery network ports. After binding messages will be
      * received. It binds on both IPv4 and IPv6.
@@ -83,7 +83,7 @@ public slots:
      */
     void sendResolve(const QString &endpointReference);
 
-private slots:
+private Q_SLOTS:
     // TODO: Make implementation private
     void receivedMessage(const KDSoapMessage &replyMessage, const KDSoapHeaders &replyHeaders, const QHostAddress &senderAddress, quint16 senderPort);
 

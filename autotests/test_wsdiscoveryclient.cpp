@@ -29,7 +29,7 @@ public:
         ;
     }
 
-private slots:
+private Q_SLOTS:
     static void testSendProbe();
     static void testSendResolve();
     static void testReceiveProbeMatch();

@@ -56,6 +56,9 @@ ecm_setup_version(PROJECT
     PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/KDSoapWSDiscoveryClientConfigVersion.cmake"
 )
 
+add_definitions(
+    -DQT_NO_SIGNALS_SLOTS_KEYWORDS
+)
 
 add_subdirectory(src)
 add_subdirectory(examples)
