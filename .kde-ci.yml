@@ -7,7 +7,7 @@ Dependencies:
     'frameworks/extra-cmake-modules': '@latest'
     'third-party/kdsoap': '@latest'
 
-- 'on': ['Linux/Qt6']
+- 'on': ['Linux/Qt6', 'FreeBSD/Qt6']
   'require':
     'frameworks/extra-cmake-modules': '@latest-kf6'
     'third-party/kdsoap': '@latest-kf6'
