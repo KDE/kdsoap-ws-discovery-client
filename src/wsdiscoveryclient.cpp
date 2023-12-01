@@ -12,6 +12,7 @@
 #include <KDSoapClient/KDSoapUdpClient>
 #include <QHostAddress>
 #include <QTimer>
+#include <QUdpSocket>
 #include <QUuid>
 
 #include "wsdl_ws-discovery.h"
@@ -47,76 +48,100 @@ void WSDiscoveryClient::start(quint16 port)
     Q_ASSERT(rc);
 }
 
+void attemptRequest(const std::function<void(const QHostAddress &address)> &callback, const QHostAddress &address, QObject *parent)
+{
+    QUdpSocket socket;
+
+    QObject::connect(&socket, &QAbstractSocket::errorOccurred, parent, [&socket, address]() {
+        socket.deleteLater();
+        qCInfo(KDSoapWSDiscoveryClient) << "Failed to connect to address" << address << "error" << socket.errorString() << socket.error();
+    });
+    QObject::connect(&socket, &QAbstractSocket::connected, parent, [&socket, callback, address]() {
+        socket.disconnectFromHost();
+    });
+    QObject::connect(&socket, &QAbstractSocket::disconnected, parent, [&socket, callback, address]() {
+        socket.deleteLater();
+        callback(address);
+    });
+    socket.connectToHost(address, DISCOVERY_PORT);
+}
+
 void WSDiscoveryClient::sendProbe(const QList<KDQName> &typeList, const QList<QUrl> &scopeList)
 {
-    WSDiscovery200504::TNS__ProbeType probe;
-    if (!typeList.isEmpty()) {
-        WSDiscovery200504::TNS__QNameListType types;
-        types.setEntries(typeList);
-        probe.setTypes(types);
-    }
-    if (!scopeList.isEmpty()) {
-        WSDiscovery200504::TNS__UriListType scopeValues;
-        scopeValues.setEntries(QUrl::toStringList(scopeList));
-        WSDiscovery200504::TNS__ScopesType scopes;
-        scopes.setValue(scopeValues);
-        probe.setScopes(scopes);
-    }
+    const auto callback = [this, typeList, scopeList](const QHostAddress &address) {
+        WSDiscovery200504::TNS__ProbeType probe;
+        if (!typeList.isEmpty()) {
+            WSDiscovery200504::TNS__QNameListType types;
+            types.setEntries(typeList);
+            probe.setTypes(types);
+        }
+        if (!scopeList.isEmpty()) {
+            WSDiscovery200504::TNS__UriListType scopeValues;
+            scopeValues.setEntries(QUrl::toStringList(scopeList));
+            WSDiscovery200504::TNS__ScopesType scopes;
+            scopes.setValue(scopeValues);
+            probe.setScopes(scopes);
+        }
 
-    KDSoapMessage message;
-    message = probe.serialize(QStringLiteral("Probe"));
-    message.setUse(KDSoapMessage::LiteralUse);
-    message.setNamespaceUri(QStringLiteral("http://schemas.xmlsoap.org/ws/2005/04/discovery"));
+        KDSoapMessage message;
+        message = probe.serialize(QStringLiteral("Probe"));
+        message.setUse(KDSoapMessage::LiteralUse);
+        message.setNamespaceUri(QStringLiteral("http://schemas.xmlsoap.org/ws/2005/04/discovery"));
 
-    KDSoapMessageAddressingProperties addressing;
-    addressing.setAddressingNamespace(KDSoapMessageAddressingProperties::Addressing200408);
-    addressing.setAction(QStringLiteral("http://schemas.xmlsoap.org/ws/2005/04/discovery/Probe"));
+        KDSoapMessageAddressingProperties addressing;
+        addressing.setAddressingNamespace(KDSoapMessageAddressingProperties::Addressing200408);
+        addressing.setAction(QStringLiteral("http://schemas.xmlsoap.org/ws/2005/04/discovery/Probe"));
 #if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
-    addressing.setMessageID(QStringLiteral("urn:uuid:") + QUuid::createUuid().toString(QUuid::WithoutBraces));
+        addressing.setMessageID(QStringLiteral("urn:uuid:") + QUuid::createUuid().toString(QUuid::WithoutBraces));
 #else
-    addressing.setMessageID(QStringLiteral("urn:uuid:") + QUuid::createUuid().toString().remove("{").remove("}"));
+        addressing.setMessageID(QStringLiteral("urn:uuid:") + QUuid::createUuid().toString().remove("{").remove("}"));
 #endif
-    addressing.setDestination(QStringLiteral("urn:schemas-xmlsoap-org:ws:2005:04:discovery"));
-    addressing.setReplyEndpointAddress(KDSoapMessageAddressingProperties::predefinedAddressToString(KDSoapMessageAddressingProperties::Anonymous));
-    message.setMessageAddressingProperties(addressing);
+        addressing.setDestination(QStringLiteral("urn:schemas-xmlsoap-org:ws:2005:04:discovery"));
+        addressing.setReplyEndpointAddress(KDSoapMessageAddressingProperties::predefinedAddressToString(KDSoapMessageAddressingProperties::Anonymous));
+        message.setMessageAddressingProperties(addressing);
 
-    auto rc = m_soapUdpClient->sendMessage(message, KDSoapHeaders(), DISCOVERY_ADDRESS_IPV4, DISCOVERY_PORT);
-    Q_ASSERT(rc);
-    rc = m_soapUdpClient->sendMessage(message, KDSoapHeaders(), DISCOVERY_ADDRESS_IPV6, DISCOVERY_PORT);
-    Q_ASSERT(rc);
+        auto rc = m_soapUdpClient->sendMessage(message, KDSoapHeaders(), address, DISCOVERY_PORT);
+        Q_ASSERT(rc);
+    };
+
+    attemptRequest(callback, DISCOVERY_ADDRESS_IPV4, this);
+    attemptRequest(callback, DISCOVERY_ADDRESS_IPV6, this);
 }
 
 void WSDiscoveryClient::sendResolve(const QString &endpointReferenceString)
 {
-    WSDiscovery200504::TNS__ResolveType resolve;
+    const auto callback = [this, endpointReferenceString](const QHostAddress &address) {
+        WSDiscovery200504::TNS__ResolveType resolve;
 
-    WSDiscovery200504::WSA__AttributedURI endpointReferenceAddress;
-    endpointReferenceAddress.setValue(endpointReferenceString);
-    WSDiscovery200504::WSA__EndpointReferenceType endpointReference;
-    endpointReference.setAddress(endpointReferenceAddress);
-    resolve.setEndpointReference(endpointReference);
+        WSDiscovery200504::WSA__AttributedURI endpointReferenceAddress;
+        endpointReferenceAddress.setValue(endpointReferenceString);
+        WSDiscovery200504::WSA__EndpointReferenceType endpointReference;
+        endpointReference.setAddress(endpointReferenceAddress);
+        resolve.setEndpointReference(endpointReference);
 
-    KDSoapMessage message;
-    message = resolve.serialize(QStringLiteral("Resolve"));
-    message.setUse(KDSoapMessage::LiteralUse);
-    message.setNamespaceUri(QStringLiteral("http://schemas.xmlsoap.org/ws/2005/04/discovery"));
+        KDSoapMessage message;
+        message = resolve.serialize(QStringLiteral("Resolve"));
+        message.setUse(KDSoapMessage::LiteralUse);
+        message.setNamespaceUri(QStringLiteral("http://schemas.xmlsoap.org/ws/2005/04/discovery"));
 
-    KDSoapMessageAddressingProperties addressing;
-    addressing.setAddressingNamespace(KDSoapMessageAddressingProperties::Addressing200408);
-    addressing.setAction(QStringLiteral("http://schemas.xmlsoap.org/ws/2005/04/discovery/Resolve"));
+        KDSoapMessageAddressingProperties addressing;
+        addressing.setAddressingNamespace(KDSoapMessageAddressingProperties::Addressing200408);
+        addressing.setAction(QStringLiteral("http://schemas.xmlsoap.org/ws/2005/04/discovery/Resolve"));
 #if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
-    addressing.setMessageID(QStringLiteral("urn:uuid:") + QUuid::createUuid().toString(QUuid::WithoutBraces));
+        addressing.setMessageID(QStringLiteral("urn:uuid:") + QUuid::createUuid().toString(QUuid::WithoutBraces));
 #else
-    addressing.setMessageID(QStringLiteral("urn:uuid:") + QUuid::createUuid().toString().remove("{").remove("}"));
+        addressing.setMessageID(QStringLiteral("urn:uuid:") + QUuid::createUuid().toString().remove("{").remove("}"));
 #endif
-    addressing.setDestination(QStringLiteral("urn:schemas-xmlsoap-org:ws:2005:04:discovery"));
-    addressing.setReplyEndpointAddress(KDSoapMessageAddressingProperties::predefinedAddressToString(KDSoapMessageAddressingProperties::Anonymous));
-    message.setMessageAddressingProperties(addressing);
+        addressing.setDestination(QStringLiteral("urn:schemas-xmlsoap-org:ws:2005:04:discovery"));
+        addressing.setReplyEndpointAddress(KDSoapMessageAddressingProperties::predefinedAddressToString(KDSoapMessageAddressingProperties::Anonymous));
+        message.setMessageAddressingProperties(addressing);
 
-    auto rc = m_soapUdpClient->sendMessage(message, KDSoapHeaders(), DISCOVERY_ADDRESS_IPV4, DISCOVERY_PORT);
-    Q_ASSERT(rc);
-    rc = m_soapUdpClient->sendMessage(message, KDSoapHeaders(), DISCOVERY_ADDRESS_IPV6, DISCOVERY_PORT);
-    Q_ASSERT(rc);
+        auto rc = m_soapUdpClient->sendMessage(message, KDSoapHeaders(), address, DISCOVERY_PORT);
+        Q_ASSERT(rc);
+    };
+
+    attemptRequest(callback, DISCOVERY_ADDRESS_IPV4, this);
+    attemptRequest(callback, DISCOVERY_ADDRESS_IPV6, this);
 }
 
 void WSDiscoveryClient::receivedMessage(const KDSoapMessage &replyMessage,
