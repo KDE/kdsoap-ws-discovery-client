@@ -3,7 +3,7 @@
 
 cmake_minimum_required(VERSION 3.7)
 
-project(kdsoap-ws-discovery-client VERSION 0.3.0)
+project(kdsoap-ws-discovery-client VERSION 0.4.0)
 
 include(FeatureSummary)
 find_package(ECM 5.54.0  NO_MODULE)
