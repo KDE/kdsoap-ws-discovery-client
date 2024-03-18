@@ -15,7 +15,6 @@
 #include <QUuid>
 
 #include "wsdl_ws-discovery.h"
-#include "wsdl_wsdd-discovery-1.h"
 
 static const int DISCOVERY_PORT = 3702;
 #define DISCOVERY_ADDRESS_IPV4 (QHostAddress(QStringLiteral("239.255.255.250")))
