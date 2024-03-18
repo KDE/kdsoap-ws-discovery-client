@@ -80,10 +80,12 @@ void WSDiscoveryClient::sendProbe(const QList<KDQName> &typeList, const QList<QU
     addressing.setReplyEndpointAddress(KDSoapMessageAddressingProperties::predefinedAddressToString(KDSoapMessageAddressingProperties::Anonymous));
     message.setMessageAddressingProperties(addressing);
 
-    auto rc = m_soapUdpClient->sendMessage(message, KDSoapHeaders(), DISCOVERY_ADDRESS_IPV4, DISCOVERY_PORT);
-    Q_ASSERT(rc);
-    rc = m_soapUdpClient->sendMessage(message, KDSoapHeaders(), DISCOVERY_ADDRESS_IPV6, DISCOVERY_PORT);
-    Q_ASSERT(rc);
+    const auto ipv4Sent = m_soapUdpClient->sendMessage(message, KDSoapHeaders(), DISCOVERY_ADDRESS_IPV4, DISCOVERY_PORT);
+    const auto ipv6Sent = m_soapUdpClient->sendMessage(message, KDSoapHeaders(), DISCOVERY_ADDRESS_IPV6, DISCOVERY_PORT);
+    if (!ipv4Sent && !ipv6Sent) {
+        qCWarning(KDSoapWSDiscoveryClient) << "Message could not be sent on IPv4 or IPv6. The network may be misconfigured.";
+        Q_ASSERT(false);
+    }
 }
 
 void WSDiscoveryClient::sendResolve(const QString &endpointReferenceString)
@@ -113,10 +115,12 @@ void WSDiscoveryClient::sendResolve(const QString &endpointReferenceString)
     addressing.setReplyEndpointAddress(KDSoapMessageAddressingProperties::predefinedAddressToString(KDSoapMessageAddressingProperties::Anonymous));
     message.setMessageAddressingProperties(addressing);
 
-    auto rc = m_soapUdpClient->sendMessage(message, KDSoapHeaders(), DISCOVERY_ADDRESS_IPV4, DISCOVERY_PORT);
-    Q_ASSERT(rc);
-    rc = m_soapUdpClient->sendMessage(message, KDSoapHeaders(), DISCOVERY_ADDRESS_IPV6, DISCOVERY_PORT);
-    Q_ASSERT(rc);
+    const auto ipv4Sent = m_soapUdpClient->sendMessage(message, KDSoapHeaders(), DISCOVERY_ADDRESS_IPV4, DISCOVERY_PORT);
+    const auto ipv6Sent = m_soapUdpClient->sendMessage(message, KDSoapHeaders(), DISCOVERY_ADDRESS_IPV6, DISCOVERY_PORT);
+    if (!ipv4Sent && !ipv6Sent) {
+        qCWarning(KDSoapWSDiscoveryClient) << "Message could not be sent on IPv4 or IPv6. The network may be misconfigured.";
+        Q_ASSERT(false);
+    }
 }
 
 void WSDiscoveryClient::receivedMessage(const KDSoapMessage &replyMessage,
