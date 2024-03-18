@@ -33,8 +33,8 @@ QDebug operator<<(QDebug dbg, const KDQName &qn)
 
 WSDiscoveryClient::WSDiscoveryClient(QObject *parent)
     : QObject(parent)
+    , m_soapUdpClient(new KDSoapUdpClient(this))
 {
-    m_soapUdpClient = new KDSoapUdpClient(this);
     connect(m_soapUdpClient, &KDSoapUdpClient::receivedMessage, this, &WSDiscoveryClient::receivedMessage);
 }
 
