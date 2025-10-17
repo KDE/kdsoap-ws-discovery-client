@@ -2,8 +2,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
-cmake_minimum_required(VERSION 3.7)
-
 set(GLOBAL_KSWSDL2CPP_OPTION)
 get_filename_component(KDWSDL_IMPORT_PATH ../wsdl/ ABSOLUTE)
 set(GLOBAL_KSWSDL2CPP_OPTION -import-path ${KDWSDL_IMPORT_PATH} -use-local-files-only)

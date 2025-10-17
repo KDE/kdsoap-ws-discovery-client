@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2019 Casper Meijn <casper@meijn.net>
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.16...3.30)
 
 project(kdsoap-ws-discovery-client VERSION 0.4.0)
 
