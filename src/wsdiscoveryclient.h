@@ -44,6 +44,18 @@ public:
     explicit WSDiscoveryClient(QObject *parent = nullptr);
     ~WSDiscoveryClient();
 
+    /*!
+     * \brief The ways a network can keep discovery from working.
+     */
+    enum class Error {
+        /*! The socket the answers arrive on could not be bound, so none can be received at all. */
+        SocketBindFailed,
+        /*! A message reached neither IPv4 nor IPv6, which is what a network that forbids multicast,
+         * or that is not there, looks like. */
+        MessageSendFailed,
+    };
+    Q_ENUM(Error)
+
 Q_SIGNALS:
     /*!
      * Emitted when a WS-Discovery probe match message is received. When a single message is reveived
@@ -58,6 +70,14 @@ Q_SIGNALS:
      */
     // TODO: Rename parameter
     void resolveMatchReceived(const WSDiscoveryTargetService &probeMatchService);
+
+    /*!
+     * Emitted when the network does not carry discovery, which leaves the devices on it
+     * unannounced. It says what the network refused, and an application is free to tell whoever
+     * waits for a list of devices why it stays short.
+     * \param error What could not be done
+     */
+    void errorOccurred(WSDiscoveryClient::Error error);
 
 public Q_SLOTS:
     /*!

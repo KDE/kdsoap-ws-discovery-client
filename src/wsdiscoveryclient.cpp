@@ -42,8 +42,11 @@ WSDiscoveryClient::~WSDiscoveryClient() = default;
 
 void WSDiscoveryClient::start(quint16 port)
 {
-    bool rc = m_soapUdpClient->bind(port, QAbstractSocket::DefaultForPlatform);
-    Q_ASSERT(rc);
+    const bool bound = m_soapUdpClient->bind(port, QAbstractSocket::DefaultForPlatform);
+    if (!bound) {
+        qCWarning(KDSoapWSDiscoveryClient) << "Could not bind the discovery socket to port" << port << ". Service discovery will not work.";
+        Q_EMIT errorOccurred(Error::SocketBindFailed);
+    }
 }
 
 void WSDiscoveryClient::sendProbe(const QList<KDQName> &typeList, const QList<QUrl> &scopeList)
@@ -83,7 +86,7 @@ void WSDiscoveryClient::sendProbe(const QList<KDQName> &typeList, const QList<QU
     const auto ipv6Sent = m_soapUdpClient->sendMessage(message, KDSoapHeaders(), DISCOVERY_ADDRESS_IPV6, DISCOVERY_PORT);
     if (!ipv4Sent && !ipv6Sent) {
         qCWarning(KDSoapWSDiscoveryClient) << "Message could not be sent on IPv4 or IPv6. The network may be misconfigured.";
-        Q_ASSERT(false);
+        Q_EMIT errorOccurred(Error::MessageSendFailed);
     }
 }
 
@@ -118,7 +121,7 @@ void WSDiscoveryClient::sendResolve(const QString &endpointReferenceString)
     const auto ipv6Sent = m_soapUdpClient->sendMessage(message, KDSoapHeaders(), DISCOVERY_ADDRESS_IPV6, DISCOVERY_PORT);
     if (!ipv4Sent && !ipv6Sent) {
         qCWarning(KDSoapWSDiscoveryClient) << "Message could not be sent on IPv4 or IPv6. The network may be misconfigured.";
-        Q_ASSERT(false);
+        Q_EMIT errorOccurred(Error::MessageSendFailed);
     }
 }
 
